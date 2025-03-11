@@ -7,6 +7,7 @@ import SignUp from './pages/Signup'
 import { useEffect } from 'react'
 import { useAuthStore } from './store/useAuthStore'
 import { Loader } from 'lucide-react'
+import Navbar from './components/Navbar'
 
 const App = () => {
 	const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
@@ -21,6 +22,7 @@ const App = () => {
 	</div>
 	return (
 		<div className='text-red-200'>
+			<Navbar />
 			<Routes>
 				<Route
 					path='/'
