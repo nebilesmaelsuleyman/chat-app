@@ -1,7 +1,7 @@
 const SettingPage = () => {
 	return (
 		<div>
-			<h2>hellow </h2>
+			<h2>settting </h2>
 		</div>
 	)
 }

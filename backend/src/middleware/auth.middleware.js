@@ -3,7 +3,8 @@ import User from '../models/user.model.js'
 
 export const protectRoute = async (req, res, next) => {
 	try {
-		const token = req.cookie.jwt
+		const token = req.cookies.jwt
+		console.log('token from the protected route', token)
 		if (!token) {
 			return res.status(400).json({ message: 'user not loged in ' })
 		}
@@ -14,6 +15,7 @@ export const protectRoute = async (req, res, next) => {
 		const user = await User.findById(decoded.userId).select('-password')
 
 		req.user = user
+		console.log('loaded user ', req.user)
 		next()
 	} catch (error) {
 		console.log('error in protectRoute middleware', error.message)

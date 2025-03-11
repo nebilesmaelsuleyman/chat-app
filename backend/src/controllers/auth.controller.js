@@ -109,7 +109,3 @@ export const checkAuth = async (req, res) => {
 		res.status(500).json({ message: 'internal server Error' })
 	}
 }
-export const hellow = (req, res) => {
-	console.log('homepage')
-	res.send('hellow home page')
-}

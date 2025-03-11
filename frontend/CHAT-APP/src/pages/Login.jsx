@@ -1,7 +1,7 @@
 const LoginPage = () => {
 	return (
 		<div>
-			<h2>hellow </h2>
+			<h2>login </h2>
 		</div>
 	)
 }

@@ -5,11 +5,10 @@ import {
 	logout,
 	updateProfile,
 	checkAuth,
-	hellow,
 } from '../controllers/auth.controller.js'
 import { protectRoute } from '../middleware/auth.middleware.js'
 const router = express.Router()
-router.get('/', hellow)
+
 router.post('/signup', signup)
 router.post('/login', login)
 router.post('/logout', logout)

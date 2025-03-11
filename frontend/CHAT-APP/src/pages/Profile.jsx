@@ -1,7 +1,7 @@
 const ProfilePage = () => {
 	return (
 		<div>
-			<h2>hellow </h2>
+			<h2>profile</h2>
 		</div>
 	)
 }
