@@ -1,3 +1,5 @@
 @import 'tailwindcss';
 /* DaisyUI plugin should be configured in the Tailwind CSS configuration file */
-@plugin "daisyui";
+@plugin "daisyui" {
+	themes: all;
+}
