@@ -6,11 +6,13 @@ import Profile from './pages/Profile'
 import SignUp from './pages/Signup'
 import { useEffect } from 'react'
 import { useAuthStore } from './store/useAuthStore'
+import { useThemeStore } from './store/useThemeStore'
 import { Loader } from 'lucide-react'
 import Navbar from './components/Navbar'
 
 const App = () => {
 	const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+	const { theme } = useThemeStore()
 	useEffect(() => {
 		checkAuth()
 	}, [checkAuth])
@@ -21,7 +23,7 @@ const App = () => {
 		<Loader className='size-10 animate-spin' />
 	</div>
 	return (
-		<div className='text-red-200'>
+		<div data-theme={theme} className='text-red-200'>
 			<Navbar />
 			<Routes>
 				<Route
@@ -36,7 +38,7 @@ const App = () => {
 					path='/login'
 					element={!authUser ? <Login /> : <Navigate to={'/'} />}
 				/>
-				<Route path='/setting' element={<Setting />} />
+				<Route path='/settings' element={<Setting />} />
 				<Route
 					path='/profile'
 					element={authUser ? <Profile /> : <Navigate to={'/login'} />}
