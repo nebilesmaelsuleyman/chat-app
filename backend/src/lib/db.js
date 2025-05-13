@@ -1,10 +1,13 @@
 import mongoose from 'mongoose'
 
 export const connectDB = async () => {
-	try {
-		const conn = await mongoose.connect(process.env.MONGODB_URL)
-		console.log(`mongoddb connected:${conn.connection.host}`)
-	} catch (error) {
-		console.log('mongodb connectin error', error)
+	const uri = process.env.MONGODB_URL
+	if (!uri) {
+		throw new Error('MONGODB_URL is missing in enviroment variables')
 	}
+	await mongoose.connect(uri, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	console.log('Mongodb connected')
 }
