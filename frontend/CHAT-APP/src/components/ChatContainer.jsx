@@ -4,14 +4,38 @@ import ChatHeader from './ChatHeader'
 import MessageInput from './MessageInput'
 import MessageSkeleton from './Skeletons/MessageSkeleton'
 import { useAuthStore } from '../store/useAuthStore'
+import { useEffect, useRef } from 'react'
+
+// Utility function to format message time
+const formatMessageTime = (timestamp) => {
+	const date = new Date(timestamp)
+	return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
 const ChatContainer = () => {
-	const { messages, getMessages, isMessageLoading, selectedUser } =
-		useChatStore()
+	const {
+		messages,
+		getMessages,
+		isMessageLoading,
+		selectedUser,
+		subscribeToMessages,
+		unsubscribeTomessage,
+	} = useChatStore()
+	const messageEndRef = useRef(null)
+
 	const { authUser } = useAuthStore()
 
 	useEffect(() => {
 		getMessages(selectedUser._id)
-	}, [selectedUser > _id, getMessages])
+		subscribeToMessages
+		return () => unsubscribeTomessage()
+	}, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeTomessage])
+
+	useEffect(() => {
+		if (messageEndRef.current && messages) {
+			messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+		}
+	}, [messages])
+
 	if (isMessageLoading)
 		return (
 			<div className=' flex-1 flex flex-col overflow-auto'>

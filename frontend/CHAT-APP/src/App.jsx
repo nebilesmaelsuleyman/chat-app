@@ -11,12 +11,13 @@ import { Loader } from 'lucide-react'
 import Navbar from './components/Navbar'
 
 const App = () => {
-	const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+	const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore()
+	console.log('online users', onlineUsers)
 	const { theme } = useThemeStore()
 	useEffect(() => {
 		checkAuth()
 	}, [checkAuth])
-	console.log(authUser)
+	console.log('auth user', authUser)
 
 	if (isCheckingAuth && !authUser) return
 	;<div className='flex items-center justify-center h-screen'>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import toast from 'react-hot-toast'
 const MessageInput = () => {

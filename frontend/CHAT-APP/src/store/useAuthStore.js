@@ -12,13 +12,12 @@ export const useAuthStore = create((set, get) => ({
 	isUpdatingProfile: false,
 	isSigningUp: false,
 	onlineUsers: [],
-	isCheckingAuth: true,
 	socket: null,
 
 	checkAuth: async () => {
 		try {
 			const res = await axiosInstance.get('/auth/check')
-			set({ authusUser: res.data })
+			set({ authUser: res.data })
 			get().connectSocket()
 		} catch (error) {
 			console.log('erro in chackAuth', error)
@@ -40,6 +39,7 @@ export const useAuthStore = create((set, get) => ({
 		}
 	},
 	login: async (data) => {
+		set({ isLoggingIn: true })
 		try {
 			const res = await axiosInstance.post('/auth/login', data)
 			set({ authUser: res.data })
@@ -53,7 +53,7 @@ export const useAuthStore = create((set, get) => ({
 		}
 	},
 
-	logout: async (params) => {
+	logout: async () => {
 		try {
 			set({ authUser: null })
 			toast.success('Logged out successfully')
@@ -76,11 +76,22 @@ export const useAuthStore = create((set, get) => ({
 			set({ isUpdatingProfile: false })
 		}
 	},
+
 	connectSocket: async () => {
 		const { authUser } = get()
 		if (!authUser) return
-		const socket = io(Base_url)
+		const socket = io(Base_url, {
+			query: {
+				userId: authUser._id,
+			},
+		})
 		socket.connect()
+		set({ socket: socket })
+		socket.on('getOnlineUsers', (userIds) => {
+			set({ onlineUsers: userIds })
+		})
 	},
-	disconnectSocket: async () => {},
+	disconnectSocket: async () => {
+		if (get().socket?.connected) get().socket.disconnect()
+	},
 }))
