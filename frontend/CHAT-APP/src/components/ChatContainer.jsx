@@ -1,4 +1,3 @@
-import { Divide } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import ChatHeader from './ChatHeader'
 import MessageInput from './MessageInput'
@@ -25,8 +24,11 @@ const ChatContainer = () => {
 	const { authUser } = useAuthStore()
 
 	useEffect(() => {
+		if (!selectedUser._id) return
+		console.log('selected user from chatcontainer', selectedUser._id)
+
 		getMessages(selectedUser._id)
-		subscribeToMessages
+		subscribeToMessages()
 		return () => unsubscribeTomessage()
 	}, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeTomessage])
 
