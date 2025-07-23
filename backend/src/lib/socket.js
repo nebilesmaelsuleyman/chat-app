@@ -28,6 +28,16 @@ io.on('connection', (socket) => {
 		delete userSocketMap[userId]
 		io.emit('getOnlineUsers', Object.keys(userSocketMap))
 	})
+
+	socket.on('newMassages', (message) => {
+		set((state) => {
+			const newMassages = [...state.messages, message]
+			localStorage.setItem(
+				`chat-${message.senderId}`,
+				JSON.stringify(newMassages)
+			)
+		})
+	})
 })
 
 export { io, app, server }

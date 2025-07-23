@@ -3,7 +3,7 @@ import ChatHeader from './ChatHeader'
 import MessageInput from './MessageInput'
 import MessageSkeleton from './Skeletons/MessageSkeleton'
 import { useAuthStore } from '../store/useAuthStore'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // Utility function to format message time
 const formatMessageTime = (timestamp) => {
@@ -12,13 +12,15 @@ const formatMessageTime = (timestamp) => {
 }
 const ChatContainer = () => {
 	const {
-		messages,
+		messages: liveMessages,
 		getMessage,
 		isMessageLoading,
 		selectedUser,
 		subscribeToMessages,
 		unsubscribeTomessage,
 	} = useChatStore()
+	const [localMessages, setLocalMessages] = useState([])
+
 	const messageEndRef = useRef(null)
 
 	const { authUser } = useAuthStore()
@@ -26,7 +28,10 @@ const ChatContainer = () => {
 	useEffect(() => {
 		if (!selectedUser._id || !authUser._id) return
 		console.log('selected user from chatcontainer', selectedUser._id)
-
+		const savedMessages = localStorage.getItem(`chat-${selectedUser._id}`)
+		if (savedMessages) {
+			setLocalMessages(JSON.parse(savedMessages))
+		}
 		getMessage(selectedUser._id)
 
 		subscribeToMessages()
@@ -39,11 +44,25 @@ const ChatContainer = () => {
 		unsubscribeTomessage,
 	])
 
+	const allMessages = [...localMessages, ...liveMessages].filter(
+		(message, index, self) =>
+			index === self.findIndex((m) => m._id === message._id)
+	)
+
 	useEffect(() => {
-		if (messageEndRef.current && messages) {
+		if (messageEndRef.current && allMessages.length) {
 			messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
 		}
-	}, [messages])
+	}, [allMessages])
+
+	useEffect(() => {
+		if (selectedUser?._id && liveMessages.length) {
+			localStorage.setItem(
+				`chat-${selectedUser._id}`,
+				JSON.stringify(liveMessages)
+			)
+		}
+	}, [liveMessages, selectedUser?._id])
 
 	if (isMessageLoading)
 		return (
@@ -58,7 +77,7 @@ const ChatContainer = () => {
 			<ChatHeader />
 
 			<div className='flex-1 overflow-y-auto p-4 space-y-4'>
-				{messages.map((message) => (
+				{allMessages.map((message) => (
 					<div
 						key={message._id}
 						className={`chat ${
