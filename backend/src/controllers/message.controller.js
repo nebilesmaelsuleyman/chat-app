@@ -22,12 +22,15 @@ export const getMessages = async (req, res) => {
 		const { id: userToChatId } = req.params
 		const myId = req.user._id
 
-		const message = await Message.find({
+		const messages = await Message.find({
 			$or: [
-				{ sendeId: myId, recieverId: userToChatId },
-				{ senderId: userToChatId, receiverid: myId },
+				{ senderId: myId, receiverId: userToChatId },
+				{ senderId: userToChatId, receiverId: myId },
 			],
 		})
+			.sort({ createdAt: 1 })
+			.lean()
+		res.status(200).json(messages)
 	} catch (error) {
 		console.log('eror in getuserforsidebar:', error.message)
 		res.status(500).json({ error: 'Internal server Error' })
@@ -36,8 +39,12 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
 	try {
-		let image
-		if (image) {
+		const { text, image } = req.body
+		const { userId: receiverId } = req.params
+		const senderId = req.user._id
+
+		let imageUrl
+		if (imageUrl) {
 			//upload base64 image to cloudinary
 			const uploadResponse = await cloudinary.uploader.upload(image)
 			imageUrl = uploadResponse.secure_url
@@ -49,7 +56,7 @@ export const sendMessage = async (req, res) => {
 			image: imageUrl,
 		})
 		await newMessage.save()
-
+		// console.log(newMessage)
 		// todo:...
 		const receiverSocketid = getReceiverSocketId(receiverId)
 
@@ -58,5 +65,8 @@ export const sendMessage = async (req, res) => {
 		}
 
 		res.status(201).json(newMessage)
-	} catch (error) {}
+	} catch (error) {
+		console.log('Error in sendMessage controller:', error.message)
+		res.status(500).json({ error: 'internal server error' })
+	}
 }

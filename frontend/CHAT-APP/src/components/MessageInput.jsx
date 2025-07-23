@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import toast from 'react-hot-toast'
-import { Send, Image } from 'lucide-react'
+import { Send, Image, X } from 'lucide-react'
 const MessageInput = () => {
 	const [text, setText] = useState('')
 	const [imagePreview, setImagePreview] = useState(null)
@@ -25,15 +25,20 @@ const MessageInput = () => {
 		if (fileInputRef.current) fileInputRef.current.value = ''
 	}
 	const handleSendMessage = async (e) => {
+		console.log('Form submit triggered')
 		e.preventDefault()
+
+		const payload = {
+			text: text.trim(),
+			image: imagePreview,
+		}
+
+		console.log('submit message', payload)
 		if (!text.trim() && !imagePreview) return
 
 		try {
-			await sendMessage({
-				text: text.trim(),
-				image: imagePreview,
-			})
-
+			await sendMessage({ text: text.trim(), image: imagePreview })
+			console.log('sendmessage', sendMessage)
 			// Clear form
 			setText('')
 			setImagePreview(null)
@@ -63,6 +68,7 @@ const MessageInput = () => {
 					</div>
 				</div>
 			)}
+
 			<form onSubmit={handleSendMessage} className='flex items-center gap-2'>
 				<div className='flex-1 flex gap-2'>
 					<input

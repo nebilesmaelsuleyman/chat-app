@@ -9,7 +9,7 @@ import {
 const router = express.Router()
 
 router.get('/user', protectRoute, getUserForSidebar)
-router.get('/:id', protectRoute, getMessages)
-router.post('/send/:id', protectRoute, sendMessage)
+router.get('/messages/:userId', protectRoute, getMessages)
+router.post('/messages/send/:userId', protectRoute, sendMessage)
 
 export default router

@@ -13,7 +13,7 @@ const formatMessageTime = (timestamp) => {
 const ChatContainer = () => {
 	const {
 		messages,
-		getMessages,
+		getMessage,
 		isMessageLoading,
 		selectedUser,
 		subscribeToMessages,
@@ -24,13 +24,20 @@ const ChatContainer = () => {
 	const { authUser } = useAuthStore()
 
 	useEffect(() => {
-		if (!selectedUser._id) return
+		if (!selectedUser._id || !authUser._id) return
 		console.log('selected user from chatcontainer', selectedUser._id)
 
-		getMessages(selectedUser._id)
+		getMessage(selectedUser._id)
+
 		subscribeToMessages()
 		return () => unsubscribeTomessage()
-	}, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeTomessage])
+	}, [
+		selectedUser._id,
+		authUser._id,
+		getMessage,
+		subscribeToMessages,
+		unsubscribeTomessage,
+	])
 
 	useEffect(() => {
 		if (messageEndRef.current && messages) {

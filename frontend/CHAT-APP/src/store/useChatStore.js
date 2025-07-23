@@ -21,11 +21,15 @@ export const useChatStore = create((set, get) => ({
 		}
 	},
 
-	getMessages: async (userId) => {
+	getMessage: async (userId) => {
 		set({ isMessageLoading: true })
 		try {
 			const res = await axiosInstance.get(`/messages/${userId}`)
-			set({ messages: res.data })
+			set({
+				messages: res.data.sort(
+					(a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+				),
+			})
 		} catch (error) {
 			toast.error(error.response.data.message)
 		} finally {
@@ -38,13 +42,15 @@ export const useChatStore = create((set, get) => ({
 			toast.error('No user selected!')
 			return
 		}
-
+		console.log('selecteduserId from the sendmessagefun', selectedUser._id)
+		console.log('message', messageData)
 		try {
 			const res = await axiosInstance.post(
 				`/messages/send/${selectedUser._id}`,
 				messageData
 			)
 			set({ messages: [...messages, res.data] })
+			console.log('messagedAta', messageData)
 		} catch (error) {
 			toast.error(error.response.data.message)
 		}
@@ -52,6 +58,7 @@ export const useChatStore = create((set, get) => ({
 
 	setSelectedUser: (user) =>
 		set((state) => {
+			if (!user) return { selectedUser: null }
 			if (state.selectedUser?._id === user._id) return {}
 			return { selectedUser: user }
 		}),
@@ -63,6 +70,7 @@ export const useChatStore = create((set, get) => ({
 
 		// todo: optimize this one later
 		socket.on('newmessage', (newMessage) => {
+			if (newMessage.senderId !== selectedUser._id) return
 			set({ messages: [...get().messages, newMessage] })
 		})
 	},
