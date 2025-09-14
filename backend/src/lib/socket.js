@@ -22,21 +22,40 @@ io.on('connection', (socket) => {
 	if (userId) userSocketMap[userId] = socket.id
 
 	//io.emit() is used to send events to all connected clients
-	io.emit('getOnlineUsers', Object.keys(userSocketMap))
+	// send online users to each client (excluding themselves)
+	Object.entries(userSocketMap).forEach(([id, socketId]) => {
+		io.to(socketId).emit(
+			'getOnlineUsers',
+			Object.keys(userSocketMap).filter((id) => id !== userId)
+		)
+	})
+
 	socket.on('disconnect', () => {
 		console.log('A user disconnected ', socket.id)
 		delete userSocketMap[userId]
-		io.emit('getOnlineUsers', Object.keys(userSocketMap))
+
+		// re-send personalized lists again after someone disconnects
+		Object.entries(userSocketMap).forEach(([id, socketId]) => {
+			io.to(socketId).emit(
+				'getOnlineUsers',
+				Object.keys(userSocketMap).filter((id) => id !== userId)
+			)
+		})
 	})
 
 	socket.on('newMassages', (message) => {
-		set((state) => {
-			const newMassages = [...state.messages, message]
-			localStorage.setItem(
-				`chat-${message.senderId}`,
-				JSON.stringify(newMassages)
-			)
-		})
+		const receiverSocketId = getReceiverSocketId(message.receiverId)
+
+		if (receiverSocketId) {
+			// send to receiver only
+			io.to(receiverSocketId).emit('newMessage', message)
+		}
+
+		// also emit to sender so their UI updates
+		const senderSocketId = getReceiverSocketId(message.senderId)
+		if (senderSocketId) {
+			io.to(senderSocketId).emit('newMessage', message)
+		}
 	})
 })
 
